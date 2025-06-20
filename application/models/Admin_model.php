@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Admin_model extends CI_Model {
 
-    // Helper untuk mencatat log aktivitas
+    
     private function log_aktivitas($aktivitas) {
         $data = [
             'id_user' => $this->session->userdata('id_user'),
@@ -15,7 +15,7 @@ class Admin_model extends CI_Model {
     }
 
     
-    // Dashboard (Admin)
+    
     public function get_total_stok() {
         $this->db->select('SUM(stok) as total');
         $query = $this->db->get('obat');
@@ -36,7 +36,7 @@ class Admin_model extends CI_Model {
         return $query->row()->total ?: 0;
     }
 
-    // Obat (Admin dan Kasir)
+    
 public function get_all_obat($keyword = '') {
     $this->db->select('id_obat, nama_obat, harga, stok');
     $this->db->from('obat');
@@ -110,7 +110,7 @@ public function get_all_obat($keyword = '') {
         return $result;
     }
 
-    // Kategori (Admin)
+    
     public function get_all_kategori() {
         return $this->db->get('kategori')->result_array();
     }
@@ -150,7 +150,7 @@ public function get_all_obat($keyword = '') {
         return $result;
     }
 
-    // Jenis (Admin)
+    
     public function get_all_jenis() {
         return $this->db->get('jenis')->result_array();
     }
@@ -190,7 +190,7 @@ public function get_all_obat($keyword = '') {
         return $result;
     }
 
-    // Suplier (Admin)
+    
     public function get_all_suplier() {
         return $this->db->get('suplier')->result_array();
     }
@@ -230,7 +230,7 @@ public function get_all_obat($keyword = '') {
         return $result;
     }
 
-    // Pengguna (Admin)
+    
     public function get_all_users($filters = []) {
         $this->db->from('user');
         if (!empty($filters['role'])) {
@@ -274,7 +274,7 @@ public function get_all_obat($keyword = '') {
         return $result;
     }
 
-    // Log Aktivitas (Admin)
+    
     public function get_all_log_aktivitas($filters = [], $limit = 20, $offset = 0) {
         $this->db->select('log_aktivitas.*, user.nama');
         $this->db->from('log_aktivitas');
@@ -307,7 +307,7 @@ public function get_all_obat($keyword = '') {
         return $this->db->count_all_results();
     }
 
-    // Penjualan (Admin dan Kasir)
+    
     public function get_all_penjualan($filters = []) {
         $this->db->select('penjualan.id_penjualan, penjualan.tanggal, penjualan.total_harga, user.nama as nama_user');
         $this->db->from('penjualan');
@@ -347,13 +347,13 @@ public function get_all_obat($keyword = '') {
     public function insert_penjualan($penjualan, $details) {
         $this->db->trans_start();
 
-        // Insert penjualan
+        
         $penjualan['created_at'] = date('Y-m-d H:i:s');
         $penjualan['updated_at'] = date('Y-m-d H:i:s');
         $this->db->insert('penjualan', $penjualan);
         $id_penjualan = $this->db->insert_id();
 
-        // Insert details dan update stok
+        
         foreach ($details as $detail) {
             $detail['id_penjualan'] = $id_penjualan;
             $this->db->insert('detail_penjualan', $detail);
@@ -369,7 +369,7 @@ public function get_all_obat($keyword = '') {
         return $this->db->trans_status() ? $id_penjualan : FALSE;
     }
 
-    // Laporan Penjualan (Admin dan Kasir)
+    
     public function get_laporan_penjualan($filters) {
         $this->db->select('penjualan.id_penjualan, penjualan.tanggal, penjualan.total_harga, user.nama as nama_user');
         $this->db->from('penjualan');
@@ -400,7 +400,7 @@ public function get_all_obat($keyword = '') {
         return $result;
     }
 
-    // Laporan Stok Obat (Admin)
+    
     public function get_laporan_stok_obat($filters = []) {
         $this->db->select('obat.*, kategori.nama_kategori, jenis.nama_jenis');
         $this->db->from('obat');
@@ -415,7 +415,7 @@ public function get_all_obat($keyword = '') {
         return $this->db->get()->result_array();
     }
 
-    // Laporan Stok Menipis (Admin)
+    
     public function get_laporan_stok_menipis($filters = []) {
         $this->db->select('obat.*, kategori.nama_kategori, jenis.nama_jenis');
         $this->db->from('obat');
@@ -431,7 +431,7 @@ public function get_all_obat($keyword = '') {
         return $this->db->get()->result_array();
     }
 
-    // Penjualan Hari Ini Kasir (Kasir)
+    
     public function get_penjualan_hari_ini_kasir($id_user) {
         $this->db->select('SUM(total_harga) as total');
         $this->db->where('DATE(tanggal)', date('Y-m-d'));
@@ -461,12 +461,15 @@ public function get_pengguna_filtered($filters = []) {
 public function get_obat_menipis_list()
 {
     return $this->db
-        ->select('nama_obat') // ambil nama saja
+        ->select('obat.nama_obat, obat.stok, kategori.nama_kategori AS kategori')
         ->from('obat')
-        ->where('stok <=', 10) // sesuaikan dengan batas stok minimal
+        ->join('kategori', 'kategori.id_kategori = obat.id_kategori', 'left')
+        ->where('obat.stok <', 10) // angka 10 = ambang batas stok menipis
+        ->order_by('obat.stok', 'asc')
         ->get()
         ->result_array();
 }
+
 
 
 public function get_all_logs_ordered() {
@@ -503,10 +506,10 @@ public function count_all_penjualan() {
 public function get_log_aktivitas_terbaru($limit = 5) {
     $this->db->select('log_aktivitas.*, user.nama as nama_user');
     $this->db->from('log_aktivitas');
-    $this->db->join('user', 'user.id_user = log_aktivitas.id_user', 'left'); // ✅ gunakan id_user
+    $this->db->join('user', 'user.id_user = log_aktivitas.id_user', 'left'); 
     $this->db->order_by('waktu', 'DESC');
     $this->db->limit($limit);
-    return $this->db->get()->result(); // hasil berupa array of object
+    return $this->db->get()->result(); 
 }
 public function count_penjualan_by_user($id_user) {
     return $this->db->where('id_user', $id_user)->count_all_results('penjualan');
