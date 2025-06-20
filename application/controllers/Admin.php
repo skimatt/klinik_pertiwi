@@ -23,7 +23,7 @@ public function index() {
     $data['stok_menipis'] = $this->Admin_model->get_stok_menipis();
     $data['obat_menipis'] = $this->Admin_model->get_obat_menipis_list();
 
-    // ✅ Penambahan data tambahan:
+    //  Penambahan data tambahan:
     $data['total_obat'] = $this->Admin_model->count_all_obat();                    // Total jumlah obat
     $data['total_kategori'] = $this->Admin_model->count_all_kategori();            // Total kategori obat
     $data['total_jenis'] = $this->Admin_model->count_all_jenis();                  // Total jenis obat

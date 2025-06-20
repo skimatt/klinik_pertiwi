@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html
   lang="en"
@@ -36,6 +37,97 @@
 
   <!-- Bootstrap 4 for PHP 5.6 compatibility -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+  <!-- Custom CSS for enhanced dashboard -->
+  <style>
+    .dashboard-stats-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 15px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .dashboard-stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .stats-card-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .stats-card-warning {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stats-card-danger {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stats-card-info {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .stats-card-success {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    
+    .chart-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+    }
+    
+    .chart-container:hover {
+      transform: translateY(-2px);
+    }
+    
+    .activity-item {
+      padding: 15px;
+      margin-bottom: 10px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+      transition: all 0.3s ease;
+    }
+    
+    .activity-item:hover {
+      background: #e9ecef;
+      transform: translateX(5px);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .floating-card {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+  </style>
 
   <!-- Helpers -->
   <script src="<?php echo base_url('assets/vendor/js/helpers.js'); ?>"></script>
@@ -210,65 +302,118 @@
                 </div>
               </div>
               <!--/ Additional Stats -->
+              <!-- Charts Section -->
+            <div class="row g-4 mb-4">
+              <!-- Stock Overview Chart -->
+              <div class="col-lg-6">
+                <div class="card chart-container h-100">
+                  <div class="card-header">
+                    <h5 class="gradient-text mb-0">📈 Overview Stok Obat</h5>
+                    <p class="text-muted small mb-0">Distribusi stok keseluruhan</p>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="stockOverviewChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- System Overview Chart -->
+              <div class="col-lg-6">
+                <div class="card chart-container h-100">
+                  <div class="card-header">
+                    <h5 class="gradient-text mb-0">📊 Overview Sistem</h5>
+                    <p class="text-muted small mb-0">Perbandingan data keseluruhan</p>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="salesTrendChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-              <!-- Log Aktivitas Terbaru -->
+            <!-- Category Distribution and System Stats -->
+            <div class="row g-4 mb-4">
+              <div class="col-lg-8">
+                <div class="card chart-container h-100">
+                  <div class="card-header">
+                    <h5 class="gradient-text mb-0">📈 Distribusi Data Sistem</h5>
+                    <p class="text-muted small mb-0">Visualisasi data berdasarkan kategori sistem</p>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="categoryChart" height="250"></canvas>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-lg-4">
+                <div class="card chart-container h-100">
+                  <div class="card-header">
+                    <h5 class="gradient-text mb-0">⚡ Status Stok</h5>
+                    <p class="text-muted small mb-0">Kondisi stok saat ini</p>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="systemStatusChart" height="250"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="row">
               <div class="col-12">
-                <div class="card h-100">
+                <div class="card chart-container">
                   <div class="card-header d-flex align-items-center justify-content-between">
-                    <div class="card-title mb-0">
-                      <h5 class="m-0 me-2">Aktivitas Terbaru</h5>
-                      <p class="card-subtitle">Real-time Log</p>
+                    <div>
+                      <h5 class="gradient-text mb-0">🚀 Aktivitas Terbaru</h5>
+                      <p class="text-muted small mb-0">Log aktivitas real-time sistem</p>
                     </div>
                     <div class="dropdown">
-                      <button
-                        class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1"
-                        type="button"
-                        id="logAktivitas"
-                        data-bs-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false">
-                        <i class="ti ti-dots-vertical ti-md text-muted"></i>
+                      <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="logAktivitas" data-bs-toggle="dropdown">
+                        <i class="ti ti-dots-vertical"></i>
                       </button>
-                      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="logAktivitas">
-                        <a class="dropdown-item" href="javascript:void(0);">Select All</a>
-                        <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-                        <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                      <div class="dropdown-menu dropdown-menu-end">
+                        <a class="dropdown-item" href="javascript:void(0);"><i class="ti ti-refresh me-2"></i>Refresh</a>
+                        <a class="dropdown-item" href="javascript:void(0);"><i class="ti ti-download me-2"></i>Export</a>
+                        <a class="dropdown-item" href="javascript:void(0);"><i class="ti ti-share me-2"></i>Share</a>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <ul class="p-0 m-0">
+                    <div class="row">
                       <?php if (!empty($log_aktivitas)): ?>
-                        <?php foreach ($log_aktivitas as $log): ?>
-                          <li class="d-flex mb-6">
-                            <div class="avatar flex-shrink-0 me-4">
-                              <span class="avatar-initial rounded bg-label-primary">
-                                <i class="ti ti-activity ti-26px"></i>
-                              </span>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                              <div class="me-2">
-                                <h6 class="mb-0 fw-normal"><?php echo $log->aktivitas; ?></h6>
-                                <small class="text-muted d-block">
-                                  <?php echo isset($log->nama_user) ? $log->nama_user : 'Pengguna'; ?> •
-                                  <?php echo date('d M Y H:i', strtotime($log->waktu)); ?>
-                                </small>
+                        <?php foreach ($log_aktivitas as $index => $log): ?>
+                          <div class="col-md-6 mb-3">
+                            <div class="activity-item">
+                              <div class="d-flex align-items-center">
+                                <div class="avatar me-3">
+                                  <span class="avatar-initial rounded-circle bg-primary">
+                                    <i class="ti ti-activity"></i>
+                                  </span>
+                                </div>
+                                <div class="flex-grow-1">
+                                  <h6 class="mb-1"><?php echo $log->aktivitas; ?></h6>
+                                  <small class="text-muted">
+                                    <i class="ti ti-user me-1"></i><?php echo isset($log->nama_user) ? $log->nama_user : 'Pengguna'; ?>
+                                    <i class="ti ti-clock ms-2 me-1"></i><?php echo date('d M Y H:i', strtotime($log->waktu)); ?>
+                                  </small>
+                                </div>
                               </div>
                             </div>
-                          </li>
+                          </div>
+                          <?php if ($index >= 5) break; // Limit to 6 items ?>
                         <?php endforeach; ?>
                       <?php else: ?>
-                        <li class="d-flex mb-6">
-                          <div class="me-2">
-                            <h6 class="mb-0 fw-normal text-muted">Belum ada aktivitas tercatat.</h6>
+                        <div class="col-12">
+                          <div class="text-center py-4">
+                            <i class="ti ti-info-circle text-muted" style="font-size: 3rem;"></i>
+                            <h6 class="text-muted mt-2">Belum ada aktivitas tercatat</h6>
                           </div>
-                        </li>
+                        </div>
                       <?php endif; ?>
-                    </ul>
+                    </div>
                   </div>
                 </div>
               </div>
-              <!--/ Log Aktivitas Terbaru -->
             </div>
           </div>
           <!-- / Content -->
@@ -286,8 +431,6 @@
 
     <!-- Overlay -->
     <div class="layout-overlay layout-menu-toggle"></div>
-
-    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
     <div class="drag-target"></div>
   </div>
   <!-- / Layout wrapper -->
@@ -301,8 +444,255 @@
   <script src="<?php echo base_url('assets/vendor/libs/hammer/hammer.js'); ?>"></script>
   <script src="<?php echo base_url('assets/vendor/js/menu.js'); ?>"></script>
   <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
-
-  <!-- Main JS -->
   <script src="<?php echo base_url('assets/js/main.js'); ?>"></script>
+
+  <!-- Chart.js Initialization -->
+  <script>
+    // PHP data to JavaScript
+    const dashboardData = {
+      total_stok: <?php echo $total_stok; ?>,
+      stok_menipis: <?php echo $stok_menipis; ?>,
+      penjualan_hari_ini: <?php echo $penjualan_hari_ini; ?>,
+      total_obat: <?php echo $total_obat; ?>,
+      total_kategori: <?php echo $total_kategori; ?>,
+      total_jenis: <?php echo $total_jenis; ?>,
+      total_suplier: <?php echo $total_suplier; ?>,
+      total_pengguna: <?php echo $total_pengguna; ?>
+    };
+
+    // Chart.js configuration with modern styling
+    const chartColors = {
+      primary: '#667eea',
+      secondary: '#764ba2',
+      success: '#43e97b',
+      warning: '#f093fb',
+      danger: '#4facfe',
+      info: '#38f9d7'
+    };
+
+    // Stock Overview Doughnut Chart
+    const stockCtx = document.getElementById('stockOverviewChart').getContext('2d');
+    const stokAman = Math.max(0, dashboardData.total_stok - dashboardData.stok_menipis);
+    new Chart(stockCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Stok Menipis', 'Stok Aman'],
+        datasets: [{
+          data: [
+            dashboardData.stok_menipis,
+            stokAman
+          ],
+          backgroundColor: [
+            chartColors.warning,
+            chartColors.success
+          ],
+          borderWidth: 0,
+          cutout: '60%'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + context.parsed.toLocaleString() + ' unit';
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // System Overview Bar Chart - Based on Real Data
+    const salesCtx = document.getElementById('salesTrendChart').getContext('2d');
+    new Chart(salesCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Total Stok', 'Stok Menipis', 'Total Obat', 'Kategori', 'Supplier', 'Pengguna'],
+        datasets: [{
+          label: 'Jumlah',
+          data: [
+            dashboardData.total_stok,
+            dashboardData.stok_menipis,
+            dashboardData.total_obat,
+            dashboardData.total_kategori,
+            dashboardData.total_suplier,
+            dashboardData.total_pengguna
+          ],
+          backgroundColor: [
+            chartColors.primary,
+            chartColors.warning,
+            chartColors.success,
+            chartColors.info,
+            chartColors.danger,
+            chartColors.secondary
+          ],
+          borderRadius: 8,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label;
+                const value = context.parsed.y;
+                if (label === 'Total Stok' || label === 'Stok Menipis' || label === 'Total Obat') {
+                  return label + ': ' + value.toLocaleString() + ' unit';
+                }
+                return label + ': ' + value.toLocaleString();
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return value.toLocaleString();
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Data Comparison Polar Chart - Based on Real Data
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+      type: 'polarArea',
+      data: {
+        labels: ['Total Obat', 'Kategori', 'Jenis Obat', 'Supplier', 'Pengguna'],
+        datasets: [{
+          label: 'Jumlah',
+          data: [
+            dashboardData.total_obat,
+            dashboardData.total_kategori,
+            dashboardData.total_jenis,
+            dashboardData.total_suplier,
+            dashboardData.total_pengguna
+          ],
+          backgroundColor: [
+            chartColors.primary + '80',
+            chartColors.success + '80',
+            chartColors.warning + '80',
+            chartColors.danger + '80',
+            chartColors.info + '80'
+          ],
+          borderColor: [
+            chartColors.primary,
+            chartColors.success,
+            chartColors.warning,
+            chartColors.danger,
+            chartColors.info
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              usePointStyle: true
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + context.parsed.r.toLocaleString();
+              }
+            }
+          }
+        },
+        scales: {
+          r: {
+            beginAtZero: true,
+            ticks: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+
+    // Stock Status Doughnut Chart - Based on Real Data
+    const statusCtx = document.getElementById('systemStatusChart').getContext('2d');
+    const totalStokValue = dashboardData.total_stok;
+    const stokMenupisValue = dashboardData.stok_menipis;
+    const stokAmanValue = totalStokValue - stokMenupisValue;
+    
+    new Chart(statusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Stok Aman', 'Stok Menipis'],
+        datasets: [{
+          data: [stokAmanValue, stokMenupisValue],
+          backgroundColor: [
+            chartColors.success,
+            chartColors.warning
+          ],
+          borderWidth: 0,
+          cutout: '70%'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              usePointStyle: true,
+              font: {
+                size: 11
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                return context.label + ': ' + context.parsed.toLocaleString() + ' (' + percentage + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Add real-time updates simulation
+    setInterval(function() {
+      // Simulate data updates (you can replace this with actual AJAX calls)
+      const elements = document.querySelectorAll('.pulse-animation');
+      elements.forEach(el => {
+        el.style.opacity = '0.5';
+        setTimeout(() => {
+          el.style.opacity = '0.8';
+        }, 500);
+      });
+    }, 5000);
+  </script>
 </body>
 </html>
